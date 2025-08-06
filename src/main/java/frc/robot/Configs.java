@@ -32,7 +32,7 @@ public final class Configs {
                     .outputRange(-1, 1);
 
             turningConfig
-                    .idleMode(IdleMode.kBrake)
+                    .idleMode(IdleMode.kCoast)
                     .smartCurrentLimit(20);
             turningConfig.absoluteEncoder
                     // Invert the turning encoder, since the output shaft rotates in the opposite

@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.ADIS16470_IMU;
 // import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import com.studica.frc.AHRS;
@@ -77,6 +78,17 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+
+    SmartDashboard.putNumber("Heading", getHeading()); //keeps counting past 180
+    SmartDashboard.putNumber("Angle", m_gyro.getAngle());
+    SmartDashboard.putNumber("X Pose", getPose().getX());
+    SmartDashboard.putNumber("Y Pose", getPose().getY());
+    SmartDashboard.putNumber("Pose Angle", getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("rightFront", m_frontRight.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("leftFront", m_frontLeft.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("rightrear", m_rearRight.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("leftrear", m_rearLeft.getPosition().angle.getDegrees());
+
   }
 
   /**
@@ -143,6 +155,13 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
 
+  public void bumper(double speed,double rot) {
+    m_frontLeft.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(rot)));
+    m_frontRight.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(rot)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(rot)));
+    m_rearRight.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(rot)));
+
+  }
   /**
    * Sets the swerve ModuleStates.
    *
@@ -173,7 +192,7 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from -180 to 180
+   * @return the robot's heading in degrees, from -180 to 180 <- that is incorrect it keeps counting past 180
    */
   public double getHeading() {
     return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
