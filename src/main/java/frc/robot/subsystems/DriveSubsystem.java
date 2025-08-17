@@ -14,6 +14,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.ADIS16470_IMU;
 // import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
@@ -47,8 +55,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  //private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-  //private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
   // Odometry class for tracking robot pose
@@ -61,6 +68,18 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       });
+
+  // Simulation classes help us simulate our robot
+  private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
+  //private final studica.frc.Encoder m_rightEncoder = new studica.frc.Encoder(DriveConstants.kRightEncoderAChannel, DriveConstants.kRightEncoderBChannel);
+  private final EncoderSim m_leftEncoderSim = new EncoderSim(m_frontLeft);
+  private final EncoderSim m_rightEncoderSim = new EncoderSim(m_rightEncoder);
+  private final Field2d m_fieldSim = new Field2d();
+  private final LinearSystem<N2, N2, N2> m_drivetrainSystem =
+      LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
+  private final DifferentialDrivetrainSim m_drivetrainSimulator =
+      new DifferentialDrivetrainSim(
+          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
