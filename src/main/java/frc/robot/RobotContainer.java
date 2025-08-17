@@ -17,17 +17,15 @@ import edu.wpi.first.wpilibj.XboxController;
 //import edu.wpi.first.wpilibj.ADXL345_I2C.Axes;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
-//import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.List;
 
@@ -40,6 +38,7 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -63,19 +62,6 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
-        
-            
-
-      //  new RunCommand(
-        //    new Trigger(m_driverController,Axis.kRightTrigger).whileTrue(m_robotDrive.setX()));
-        /* 
-        if (m_driverController.getLeftTriggerAxis() > 0.5) {
-                new RunCommand(() -> m_robotDrive.setX(), m_robotDrive);
-              } 
-        */    
-            
-            
-        
   }
   
 
@@ -83,10 +69,8 @@ public class RobotContainer {
    * Use this method to define your button->command mappings. Buttons can be
    * created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
-   * subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
-   * passing it to a
-   * {@link JoystickButton}.
+   * subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
+   * and then calling passing it to a {@link JoystickButton}.
    */
   private void configureButtonBindings() {
     new JoystickButton(m_driverController, Button.kX.value)
@@ -114,7 +98,17 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kRightBumper.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.bumper(0.5, -90),
-            m_robotDrive));    
+            m_robotDrive));
+    
+    new JoystickButton(m_driverController, Axis.kRightTrigger.value)
+        .whileTrue(new RunCommand(
+            () -> m_elevator.lift(Axis.kRightTrigger.value),
+            m_elevator));
+
+    new JoystickButton(m_driverController, Axis.kLeftTrigger.value)
+        .whileTrue(new RunCommand(
+            () -> m_elevator.lift(-Axis.kLeftTrigger.value),
+            m_elevator));
     
   }
   
