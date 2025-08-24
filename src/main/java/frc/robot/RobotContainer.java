@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.List;
 
@@ -64,7 +66,21 @@ public class RobotContainer {
             m_robotDrive));
   }
   
-
+  public void periodic() {
+    JoystickButton x_button  = new JoystickButton(m_driverController, Button.kX.value);
+    SmartDashboard.putNumber("x_key", x_button.getAsBoolean()? 1:0);
+    JoystickButton x_button1  = new JoystickButton(m_driverController, Button.kX.value);
+    SmartDashboard.putNumber("x_key", x_button1.getAsBoolean()? 1:0);
+}
+    // public void putToDashboard(){
+    //     return;
+    // }
+    // private boolean isRightTriggerPressed() {
+    //     return m_driverController.getRightTriggerAxis() > Constants.OIConstants.kDriveDeadband;
+    // }
+    public static Trigger triggerButton (XboxController controller, XboxController.Axis axis) {
+        return new Trigger(() -> controller.getRawAxis(axis.value) >= Constants.OIConstants.kDriveDeadband);
+    }
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
@@ -100,14 +116,16 @@ public class RobotContainer {
             () -> m_robotDrive.bumper(0.5, -90),
             m_robotDrive));
     
-    new JoystickButton(m_driverController, Axis.kRightTrigger.value)
-        .whileTrue(new RunCommand(
-            () -> m_elevator.lift(Axis.kRightTrigger.value),
+    triggerButton(m_driverController,Axis.kRightTrigger).whileTrue(new RunCommand(
+        () -> m_elevator.lift(m_driverController.getRawAxis(Axis.kRightTrigger.value)),
+        m_elevator)).onFalse(new RunCommand(
+            () -> m_elevator.lift_stop(),
             m_elevator));
 
-    new JoystickButton(m_driverController, Axis.kLeftTrigger.value)
-        .whileTrue(new RunCommand(
-            () -> m_elevator.lift(-Axis.kLeftTrigger.value),
+    triggerButton(m_driverController,Axis.kLeftTrigger).whileTrue(new RunCommand(
+        () -> m_elevator.lift(-m_driverController.getRawAxis(Axis.kLeftTrigger.value)),
+        m_elevator)).onFalse(new RunCommand(
+            () -> m_elevator.lift_stop(),
             m_elevator));
     
   }

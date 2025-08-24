@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -62,6 +64,10 @@ public final class Constants {
 
   public static final class ElevatorConstants {
     public static final int kElevatorCanId = 9;
+    public static final int kElevatorFollowerCanId = 10;
+    public static final int kElevatorCurrentLimit = 50;
+    public static final IdleMode kElevatorIdleMode = IdleMode.kBrake;
+
   }
 
   public static final class ModuleConstants {

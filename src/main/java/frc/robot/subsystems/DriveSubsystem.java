@@ -15,8 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj.ADIS16470_IMU;
-// import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
@@ -156,6 +155,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void bumper(double speed,double rot) {
+    /*
+     * used to set the wheels to move slowly in a certain direction
+     * AKA robot oriented drive
+     * much less complicated version of the .drive method
+    */
     m_frontLeft.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(rot)));
     m_frontRight.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(rot)));
     m_rearLeft.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(rot)));
