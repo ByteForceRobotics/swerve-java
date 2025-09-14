@@ -65,8 +65,10 @@ public final class Constants {
   public static final class ElevatorConstants {
     public static final int kElevatorCanId = 9;
     public static final int kElevatorFollowerCanId = 10;
-    public static final int kElevatorCurrentLimit = 50;
+    public static final int kElevatorCurrentLimit = 30;
     public static final IdleMode kElevatorIdleMode = IdleMode.kBrake;
+    public static final int maxElevatorHeightTest = 150;//-154.06716918 unsure if this is accurate
+    public static final double zeroPos = 0.0;
 
   }
 

@@ -19,12 +19,14 @@ import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,7 +46,7 @@ public class RobotContainer {
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-
+  CommandXboxController m_commanddriverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -99,6 +101,7 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.resetEncoders(),
             m_robotDrive));
+    //m_commanddriverController.rightTrigger().whileTrue
   
 
     new JoystickButton(m_driverController, Button.kB.value)
@@ -115,15 +118,22 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.bumper(0.5, -90),
             m_robotDrive));
+
+    new JoystickButton(m_driverController, Button.kA.value)
+        .whileTrue(new RunCommand(
+            () -> m_elevator.goToPosition(-35),//is inverted because upwards is negative
+            m_elevator)).onFalse(new RunCommand(
+                () -> m_elevator.lift_stop(),
+                m_elevator));
     
-    triggerButton(m_driverController,Axis.kRightTrigger).whileTrue(new RunCommand(
-        () -> m_elevator.lift(m_driverController.getRawAxis(Axis.kRightTrigger.value)),
+    triggerButton(m_driverController,Axis.kLeftTrigger).whileTrue(new RunCommand(
+        () -> m_elevator.lift(m_driverController.getRawAxis(Axis.kLeftTrigger.value)),
         m_elevator)).onFalse(new RunCommand(
             () -> m_elevator.lift_stop(),
             m_elevator));
 
-    triggerButton(m_driverController,Axis.kLeftTrigger).whileTrue(new RunCommand(
-        () -> m_elevator.lift(-m_driverController.getRawAxis(Axis.kLeftTrigger.value)),
+    triggerButton(m_driverController,Axis.kRightTrigger).whileTrue(new RunCommand(
+        () -> m_elevator.lift(-m_driverController.getRawAxis(Axis.kRightTrigger.value)),
         m_elevator)).onFalse(new RunCommand(
             () -> m_elevator.lift_stop(),
             m_elevator));
