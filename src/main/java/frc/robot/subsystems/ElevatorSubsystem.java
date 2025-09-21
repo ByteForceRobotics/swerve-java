@@ -29,7 +29,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     SoftLimitConfig softLimitConfig = new SoftLimitConfig();
     softLimitConfig
       .forwardSoftLimit(0)//positive
-      .reverseSoftLimit(-ElevatorConstants.maxElevatorHeightTest+10)//negative(direction we want to go)
+      .reverseSoftLimit(-ElevatorConstants.maxElevatorHeightTest)//negative(direction we want to go)
       .forwardSoftLimitEnabled(true)
       .reverseSoftLimitEnabled(true);
     globalConfig

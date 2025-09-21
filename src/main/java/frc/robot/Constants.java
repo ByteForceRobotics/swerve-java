@@ -69,8 +69,12 @@ public final class Constants {
     public static final IdleMode kElevatorIdleMode = IdleMode.kBrake;
     public static final int maxElevatorHeightTest = 150;//-154.06716918 unsure if this is accurate
     public static final double zeroPos = 0.0;
-
   }
+  public static final class ReefConstants{
+    public static final int kCoralCanId = 11;
+    public static final int kAlgaeCanId = -1;
+  }
+  
 
   public static final class ModuleConstants {
     // The MAXSwerve module can be configured with one of three pinion gears: 12T,

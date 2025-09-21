@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -17,21 +19,20 @@ import edu.wpi.first.wpilibj.XboxController;
 //import edu.wpi.first.wpilibj.ADXL345_I2C.Axes;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.util.List;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ReefSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -43,6 +44,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+  private final ReefSubsystem m_reef = new ReefSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -125,7 +127,31 @@ public class RobotContainer {
             m_elevator)).onFalse(new RunCommand(
                 () -> m_elevator.lift_stop(),
                 m_elevator));
+
+    new POVButton(m_driverController, 0)
+        .whileTrue(new RunCommand(
+            () -> m_reef.moveCoral(0.2),m_reef))
+            .onFalse(new RunCommand(
+                () -> m_reef.moveCoral_stop(),m_reef));
+
+    new POVButton(m_driverController, 180)
+        .whileTrue(new RunCommand(
+            () -> m_reef.moveCoral(-0.2),m_reef))
+            .onFalse(new RunCommand(
+                () -> m_reef.moveCoral_stop(),m_reef));
     
+    new POVButton(m_driverController, 90)
+        .whileTrue(new RunCommand(
+            () -> m_reef.moveCoral(0.5),m_reef))
+            .onFalse(new RunCommand(
+                () -> m_reef.moveCoral_stop(),m_reef));
+
+    new POVButton(m_driverController, 270)
+        .whileTrue(new RunCommand(
+            () -> m_reef.moveCoral(-0.5),m_reef))
+            .onFalse(new RunCommand(
+                () -> m_reef.moveCoral_stop(),m_reef));
+
     triggerButton(m_driverController,Axis.kLeftTrigger).whileTrue(new RunCommand(
         () -> m_elevator.lift(m_driverController.getRawAxis(Axis.kLeftTrigger.value)),
         m_elevator)).onFalse(new RunCommand(
