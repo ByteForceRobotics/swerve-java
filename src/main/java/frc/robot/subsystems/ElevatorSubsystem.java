@@ -80,6 +80,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     m_elevator.set(speed);
   }
+  public void elevatorResetEncoders(){
+    m_elevator.getEncoder().setPosition(0);
+    m_elevator_follower.getEncoder().setPosition(0);
+  }
 
   @Override
   public void periodic(){

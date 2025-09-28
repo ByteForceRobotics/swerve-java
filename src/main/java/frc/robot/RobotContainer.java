@@ -71,10 +71,12 @@ public class RobotContainer {
   }
   
   public void periodic() {
+    /* 
     JoystickButton x_button  = new JoystickButton(m_driverController, Button.kX.value);
     SmartDashboard.putNumber("x_key", x_button.getAsBoolean()? 1:0);
     JoystickButton x_button1  = new JoystickButton(m_driverController, Button.kX.value);
     SmartDashboard.putNumber("x_key", x_button1.getAsBoolean()? 1:0);
+    */
 }
     // public void putToDashboard(){
     //     return;
@@ -101,8 +103,9 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, Button.kY.value)
         .whileTrue(new RunCommand(
-            () -> m_robotDrive.resetEncoders(),
-            m_robotDrive));
+            () -> m_robotDrive.driveResetEncoders(),
+            m_robotDrive)).whileTrue(new RunCommand(
+                () -> m_elevator.elevatorResetEncoders(),m_elevator));
     //m_commanddriverController.rightTrigger().whileTrue
   
 
