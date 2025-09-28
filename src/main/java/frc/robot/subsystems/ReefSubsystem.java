@@ -15,11 +15,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ReefSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
   SparkMax m_coral;
-  SparkMax m_elevator_follower;
+  SparkMax m_algae;
 
   public ReefSubsystem(){
     m_coral = new SparkMax(ReefConstants.kCoralCanId, MotorType.kBrushless);
-    
+    m_algae = new SparkMax(ReefConstants.kAlgaeCanId, MotorType.kBrushless);
   }
   
   /**
