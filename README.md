@@ -1,7 +1,7 @@
 TODO:
 * Autonomous
   * port over auto code from previous python code
-  * pathplanner
+  * pathplanner (https://pathplanner.dev/home.html)
     * move the robot config to the constants file
 
 * reef managment subsystem

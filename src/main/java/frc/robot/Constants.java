@@ -68,11 +68,15 @@ public final class Constants {
     public static final int kElevatorCurrentLimit = 30;
     public static final IdleMode kElevatorIdleMode = IdleMode.kBrake;
     public static final int maxElevatorHeightTest = 150;//-154.06716918 unsure if this is accurate
-    public static final double zeroPos = 0.0;
   }
   public static final class ReefConstants{
     public static final int kCoralCanId = 11;
-    public static final int kAlgaeCanId = -1;
+    public static final int kAlgaeCanId = 12;
+    public static final int kFunnelBeamBreakDIO = 0;
+    public static final int kCoralBeamBreakDIO = 1;
+    public static final double kCoralPassivePower = 0.02;
+    public static final double kCoralAutoLoadSpeed = 0.2;
+    public static final double kAlgaeAutoLoadSpeed = 0;
   }
   
 

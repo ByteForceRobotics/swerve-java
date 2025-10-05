@@ -74,10 +74,22 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
+    m_reef.setDefaultCommand(
+        new RunCommand(
+            () -> m_reef.autoLoadCoral(),
+            m_reef)
+    );
+    m_elevator.setDefaultCommand(
+        new RunCommand(
+            () -> m_elevator.stayAtPosition(),
+            m_elevator)
+    );
     NamedCommands.registerCommand("LiftElevatorCoral1", new RunCommand(
         () -> m_elevator.goToPosition(-35),//is inverted because upwards is negative
         m_elevator));
         autoChooser = AutoBuilder.buildAutoChooser();
+
+    
 
     // Another option that allows you to specify the default auto by its name
     // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");

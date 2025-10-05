@@ -4,22 +4,23 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import frc.robot.Constants.ElevatorConstants;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
   SparkMax m_elevator;
   SparkMax m_elevator_follower;
-
+  double goalPos;
+  double currentElevatorSpeed;
   public ElevatorSubsystem(){
     m_elevator = new SparkMax(ElevatorConstants.kElevatorCanId, MotorType.kBrushless);
     m_elevator_follower = new SparkMax(ElevatorConstants.kElevatorFollowerCanId, MotorType.kBrushless);
@@ -58,10 +59,12 @@ public class ElevatorSubsystem extends SubsystemBase {
    */
   public void lift(double xSpeed) {
     m_elevator.set(xSpeed);
+    currentElevatorSpeed = xSpeed;
   }
 
   public void lift_stop() {
     m_elevator.set(0.0);
+    goalPos = m_elevator.getEncoder().getPosition();
   }
   private double calc_speed(double position){
     double distanceToPosition = position-m_elevator.getEncoder().getPosition();
@@ -84,7 +87,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevator.getEncoder().setPosition(0);
     m_elevator_follower.getEncoder().setPosition(0);
   }
-
+  public void stayAtPosition(){
+    if(currentElevatorSpeed<0.01){
+      goToPosition(goalPos);
+    }
+  }
   @Override
   public void periodic(){
     SmartDashboard.putNumber("Elevator Speed", m_elevator.getEncoder().getVelocity());
