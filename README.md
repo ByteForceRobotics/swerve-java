@@ -31,3 +31,6 @@ TODO:
   * possible optimizations of the keybinds via the CommandXboxController.
   * add a secondary controller, or a way to implemnet it
 
+* set up simulator
+  *
+

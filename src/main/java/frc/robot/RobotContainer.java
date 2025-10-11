@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.XboxController;
 //import edu.wpi.first.wpilibj.ADXL345_I2C.Axes;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,6 +38,9 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ReefSubsystem;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -51,6 +55,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ReefSubsystem m_reef = new ReefSubsystem();
+  
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -58,10 +63,12 @@ public class RobotContainer {
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
+  //simulation
+ 
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-
+    CameraServer.startAutomaticCapture();
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -101,12 +108,7 @@ public class RobotContainer {
   }
   
   public void periodic() {
-    /* 
-    JoystickButton x_button  = new JoystickButton(m_driverController, Button.kX.value);
-    SmartDashboard.putNumber("x_key", x_button.getAsBoolean()? 1:0);
-    JoystickButton x_button1  = new JoystickButton(m_driverController, Button.kX.value);
-    SmartDashboard.putNumber("x_key", x_button1.getAsBoolean()? 1:0);
-    */
+
 }
     // public void putToDashboard(){
     //     return;
@@ -146,13 +148,15 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, Button.kLeftBumper.value)
         .whileTrue(new RunCommand(
-            () -> m_robotDrive.bumper(0.5, 90),
-            m_robotDrive));
+            () -> m_reef.moveCoral(-0.5),m_reef))// amke sure left bumper pulls coral in, maybe have it slower
+            .onFalse(new RunCommand(
+                () -> m_reef.moveCoral_stop(),m_reef));
 
     new JoystickButton(m_driverController, Button.kRightBumper.value)
         .whileTrue(new RunCommand(
-            () -> m_robotDrive.bumper(0.5, -90),
-            m_robotDrive));
+            () -> m_reef.moveCoral(0.5),m_reef))
+            .onFalse(new RunCommand(
+                () -> m_reef.moveCoral_stop(),m_reef));
 
     new JoystickButton(m_driverController, Button.kA.value)
         .whileTrue(new RunCommand(
@@ -160,7 +164,8 @@ public class RobotContainer {
             m_elevator)).onFalse(new RunCommand(
                 () -> m_elevator.lift_stop(),
                 m_elevator));
-
+    /* 
+    code for the dpad to control the coral dispenser
     new POVButton(m_driverController, 0)
         .whileTrue(new RunCommand(
             () -> m_reef.moveCoral(0.2),m_reef))
@@ -184,7 +189,7 @@ public class RobotContainer {
             () -> m_reef.moveCoral(-0.5),m_reef))
             .onFalse(new RunCommand(
                 () -> m_reef.moveCoral_stop(),m_reef));
-
+    */
     triggerButton(m_driverController,Axis.kLeftTrigger).whileTrue(new RunCommand(
         () -> m_elevator.lift(m_driverController.getRawAxis(Axis.kLeftTrigger.value)),
         m_elevator)).onFalse(new RunCommand(

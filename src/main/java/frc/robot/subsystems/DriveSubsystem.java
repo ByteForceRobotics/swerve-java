@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -53,6 +54,9 @@ public class DriveSubsystem extends SubsystemBase {
   //private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
   //private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
+
+  //simulation
+  private final Field2d m_field = new Field2d();
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -117,7 +121,9 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
-
+    SmartDashboard.putData("Field", m_field);
+    // Do this in either robot periodic or subsystem periodic
+    m_field.setRobotPose(m_odometry.getPoseMeters());
     SmartDashboard.putNumber("Heading", getHeading()); //keeps counting past 180
     SmartDashboard.putNumber("Angle", m_gyro.getAngle());
     SmartDashboard.putNumber("X Pose", getPose().getX());
