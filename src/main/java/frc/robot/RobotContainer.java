@@ -4,43 +4,28 @@
 
 package frc.robot;
 
-import java.util.List;
+import org.photonvision.PhotonCamera;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 //import edu.wpi.first.wpilibj.ADXL345_I2C.Axes;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ReefSubsystem;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.UsbCamera;
-
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -64,11 +49,20 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   //simulation
+
+  //photon cam
+  PhotonCamera camera;
+  
+  // differnet speed modes
+  double speedScaleHigh = 1.0;
+  double speedScaleLow= 0.33;
+  double speedScale = speedScaleHigh;
  
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
     CameraServer.startAutomaticCapture();
+    camera = new PhotonCamera("photonvision");
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -76,9 +70,9 @@ public class RobotContainer {
         //fieldRelative
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftY()*speedScale, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftX()*speedScale, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getRightX()*speedScale, OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
     m_reef.setDefaultCommand(
@@ -91,10 +85,16 @@ public class RobotContainer {
             () -> m_elevator.stayAtPosition(),
             m_elevator)
     );
-    NamedCommands.registerCommand("LiftElevatorCoral1", new RunCommand(
-        () -> m_elevator.goToPosition(-35),//is inverted because upwards is negative
+    NamedCommands.registerCommand("LiftElevatorCoral4", new RunCommand(
+        () -> m_elevator.goToPosition(-150),//is inverted because upwards is negative
         m_elevator));
         autoChooser = AutoBuilder.buildAutoChooser();
+    
+    NamedCommands.registerCommand("Deploy Coral", new RunCommand(
+        () -> m_reef.moveCoral(0.5),
+        m_elevator).withTimeout(1.0).andThen(new RunCommand(
+          () -> m_reef.moveCoral_stop(),
+          m_elevator)));
 
     
 
@@ -108,7 +108,7 @@ public class RobotContainer {
   }
   
   public void periodic() {
-
+    var result = camera.getLatestResult();
 }
     // public void putToDashboard(){
     //     return;
@@ -148,13 +148,13 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, Button.kLeftBumper.value)
         .whileTrue(new RunCommand(
-            () -> m_reef.moveCoral(-0.5),m_reef))// amke sure left bumper pulls coral in, maybe have it slower
+            () -> m_reef.moveCoral(-0.5*speedScale),m_reef))// amke sure left bumper pulls coral in, maybe have it slower
             .onFalse(new RunCommand(
                 () -> m_reef.moveCoral_stop(),m_reef));
 
     new JoystickButton(m_driverController, Button.kRightBumper.value)
         .whileTrue(new RunCommand(
-            () -> m_reef.moveCoral(0.5),m_reef))
+            () -> m_reef.moveCoral(0.5*speedScale),m_reef))
             .onFalse(new RunCommand(
                 () -> m_reef.moveCoral_stop(),m_reef));
 
@@ -164,6 +164,10 @@ public class RobotContainer {
             m_elevator)).onFalse(new RunCommand(
                 () -> m_elevator.lift_stop(),
                 m_elevator));
+
+    new JoystickButton(m_driverController, Button.kLeftStick.value)
+        .onTrue(new RunCommand(
+            () -> changeScale())); //may cause errors because non static
     /* 
     code for the dpad to control the coral dispenser
     new POVButton(m_driverController, 0)
@@ -202,5 +206,12 @@ public class RobotContainer {
             () -> m_elevator.lift_stop(),
             m_elevator));
     
+  }
+  public void changeScale(){
+    if(speedScale == speedScaleHigh){
+      speedScale = speedScaleLow;
+    } else {
+      speedScale = speedScaleHigh;
+    }
   }
 }

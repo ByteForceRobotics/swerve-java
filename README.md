@@ -10,7 +10,7 @@ TODO:
     * optical sensors
       * once they detect the piece of coral, have the coral intake prime it for deployment, detect it has reached the end via a second set of opticals sensors (see if possible without a second set)
   * algae removal
-    * simple motor control
+    * simple motor control DONE
     * bumper detection + roll up (when the jaw runs into the reef)
 
 * photon vision
@@ -20,7 +20,7 @@ TODO:
 
 * elevator
   * Program actual set points
-  * replace braking with active position alignment
+  * DONE replace braking with active position alignment 
     * create a variable with setgoalPosition, either use a bang bang controller or PID controller, or maybe just use the goto method we have
 
 * drive
