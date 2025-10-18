@@ -90,7 +90,7 @@ public class RobotContainer {
         m_elevator));
         autoChooser = AutoBuilder.buildAutoChooser();
     
-    NamedCommands.registerCommand("Deploy Coral", new RunCommand(
+    NamedCommands.registerCommand("DeployCoral", new RunCommand(
         () -> m_reef.moveCoral(0.5),
         m_elevator).withTimeout(1.0).andThen(new RunCommand(
           () -> m_reef.moveCoral_stop(),

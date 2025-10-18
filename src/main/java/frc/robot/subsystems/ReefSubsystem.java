@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -62,12 +63,25 @@ public class ReefSubsystem extends SubsystemBase {
       passivePower();
     }
   }
-
+  public void deployCoral(){
+    double driveTime  = 1.0;
+    m_coral.set(0.5);
+    double startTime = Timer.getFPGATimestamp();
+    
+  }
+  public boolean coralIsDeployed(double startTime,double driveTime){
+    if(Timer.getFPGATimestamp()-startTime>driveTime){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
   @Override
   public void periodic(){
     coralBeamBroken = !m_coralBeamBreak.get();
     funnelBeamBroken  = !m_funnelBeamBreak.get();
-    SmartDashboard.putBoolean("Funnel Beam Break",funnelBeamBroken);
-    SmartDashboard.putBoolean("Coral Beam Break",coralBeamBroken);
+    SmartDashboard.putBoolean("Funnel Beam",funnelBeamBroken);
+    SmartDashboard.putBoolean("Coral Beam",coralBeamBroken);
   }
 }
