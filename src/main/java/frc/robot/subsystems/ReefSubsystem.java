@@ -49,39 +49,28 @@ public class ReefSubsystem extends SubsystemBase {
 
   public void moveCoral_stop() {
     m_coral.set(0.0);
+
   }
   public void passivePower(){
     m_coral.set(ReefConstants.kCoralPassivePower);
     m_algae.set(0);
   }
   public void autoLoadCoral(){
-    if(funnelBeamBroken&&!coralBeamBroken){
+    if(funnelBeamBroken){
       moveCoral(ReefConstants.kCoralAutoLoadSpeed);
       //moveAlgae(ReefConstants.kAlgaeAutoLoadSpeed);
     }
-    if(coralBeamBroken){
-      passivePower();
+    else if(coralBeamBroken){
+      moveCoral_stop();
     }
   }
-  public void deployCoral(){
-    double driveTime  = 1.0;
-    m_coral.set(0.5);
-    double startTime = Timer.getFPGATimestamp();
-    
-  }
-  public boolean coralIsDeployed(double startTime,double driveTime){
-    if(Timer.getFPGATimestamp()-startTime>driveTime){
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
+  
   @Override
   public void periodic(){
     coralBeamBroken = !m_coralBeamBreak.get();
     funnelBeamBroken  = !m_funnelBeamBreak.get();
     SmartDashboard.putBoolean("Funnel Beam",funnelBeamBroken);
     SmartDashboard.putBoolean("Coral Beam",coralBeamBroken);
+    SmartDashboard.putNumber("Coral Speed", m_coral.getEncoder().getVelocity());
   }
 }

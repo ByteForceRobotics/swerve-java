@@ -62,10 +62,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevator.set(xSpeed);
     currentElevatorSpeed = xSpeed;
   }
-
+  
+  public void setGoalPosition(){
+    goalPos = m_elevator.getEncoder().getPosition();
+  }
   public void lift_stop() {
     m_elevator.set(0.0);
-    goalPos = m_elevator.getEncoder().getPosition();
+    
   }
   private double calc_speed(double position){
     double distanceToPosition = position-m_elevator.getEncoder().getPosition();
@@ -89,7 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevator_follower.getEncoder().setPosition(0);
   }
   public void stayAtPosition(){
-    if(currentElevatorSpeed<0.01){
+    if( m_elevator.getEncoder().getVelocity()<0.1){
       goToPosition(goalPos);
     }
   }
@@ -97,6 +100,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void periodic(){
     SmartDashboard.putNumber("Elevator Speed", m_elevator.getEncoder().getVelocity());
     SmartDashboard.putNumber("Elevator pos", m_elevator.getEncoder().getPosition());
-    SmartDashboard.putNumber("Elevator current", m_elevator.getOutputCurrent());
+    SmartDashboard.putNumber("Elevator Goal Pos", goalPos);
   }
 }
