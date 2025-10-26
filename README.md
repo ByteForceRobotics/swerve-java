@@ -1,6 +1,6 @@
 TODO:
 * Autonomous
-  * port over auto code from previous python code
+  * port over auto code from previous python code for following april tags
   * pathplanner (https://pathplanner.dev/home.html)
     * move the robot config to the constants file
 
@@ -21,15 +21,24 @@ TODO:
 * elevator
   * Program actual set points
   * DONE replace braking with active position alignment 
-    * create a variable with setgoalPosition, either use a bang bang controller or PID controller, or maybe just use the goto method we have
+  * create a variable with setgoalPosition, either use a bang bang controller or PID controller, or maybe just use the goto method we have
+  * add a button to lower elevator to zero
+  * limit the elevator to 4th coral level so no overshooting should bearound-133-135
+  * if no coral in either beam breaks, then automatically go to position 0
 
 * drive
   * quality of life: fix the bug that has the wheels snap to position when going to deadband
     * look into advantage scope
+    * if robot is moving and eleavtor is up then lower elevator 
+      * as a failsafe make it only active when the elevator is almost at the top
+    * if elevator is lifted then lower movement speed
 
-* keybinds
+* Controller Button Bindings
+  * button mappings as of 10/25 11:13 AM are located at:
+    * https://www.padcrafter.com/?templates=Controller+Scheme+1&leftTrigger=elevator+down&rightTrigger=elevator+up&rightBumper=coral+dispense&leftBumper=coral+back&leftStickClick=change+speed&leftStick=movement&rightStick=rotation&xButton=set+wheels+to+x&aButton=go+to+height+%2235%22&yButton=reset+encoders%2C+only+do+when+elevator+is+fully+down&startButton=deploy+coral+fully&bButton=zero+heading%28sets+rotation+to+zero+i+think%29
   * possible optimizations of the keybinds via the CommandXboxController.
-  * add a secondary controller, or a way to implemnet it
+  * add a secondary controller, or a way to implement it
+  * add strafing to the robot via d-pad or jusst a button to toggle field oriented driving
 
 * set up simulator
   *
