@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
@@ -21,33 +22,43 @@ public class ElevatorSubsystem extends SubsystemBase {
   SparkMax m_elevator_follower;
   double goalPos;
   double currentElevatorSpeed;
+  String currentConfig;
+  double prevPos = 0;
+  PIDController pid = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
+
   public ElevatorSubsystem(){
+    pid.setTolerance(1);
+
+
+
     m_elevator = new SparkMax(ElevatorConstants.kElevatorCanId, MotorType.kBrushless);
     m_elevator_follower = new SparkMax(ElevatorConstants.kElevatorFollowerCanId, MotorType.kBrushless);
     SparkMaxConfig globalConfig = new SparkMaxConfig();
     SparkMaxConfig leaderConfig = new SparkMaxConfig();
     SparkMaxConfig followerConfig = new SparkMaxConfig();
     SoftLimitConfig softLimitConfig = new SoftLimitConfig();
+    currentConfig = "default";
+
+
     softLimitConfig
       .forwardSoftLimit(0)//positive
-      .reverseSoftLimit(-ElevatorConstants.maxElevatorHeightTest)//negative(direction we want to go)
+      .reverseSoftLimit(-ElevatorConstants.maxNeededElevatorHeight)//negative(direction we want to go)
       .forwardSoftLimitEnabled(true)
       .reverseSoftLimitEnabled(true);
+
     globalConfig
     .apply(softLimitConfig)
       .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
       .idleMode(ElevatorConstants.kElevatorIdleMode);
       
-    
     leaderConfig
       .apply(globalConfig)
       .inverted(false);
       
-
     followerConfig
       .apply(globalConfig)
       .follow(m_elevator,true);
-    
+
     m_elevator.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_elevator_follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     
@@ -57,6 +68,7 @@ public class ElevatorSubsystem extends SubsystemBase {
    * Method to lift the elevator using joystick info.
    *
    */
+  
   public void lift(double xSpeed) {
     double truexSpeed = xSpeed;
     
@@ -74,7 +86,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     m_elevator.set(truexSpeed);
   }
-  
+  public double getElevatorPosition(){
+    return m_elevator.getEncoder().getPosition();
+  }
   public void setGoalPosition(){
     goalPos = m_elevator.getEncoder().getPosition();
   }
@@ -82,22 +96,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevator.set(-0.02);  //make sure its negative if using passive pwoer
     
   }
-  private double calc_speed(double position){
-    double distanceToPosition = position-m_elevator.getEncoder().getPosition();
-    double speed = Math.max(Math.min(0.3,distanceToPosition/10), 0.3);
-    if(Math.abs(distanceToPosition)<=0.5){
-      speed = 0;
-    }
-    return speed;
-  }
   public void goToPosition(double position){
-    double speed = calc_speed(position);
-    if(Math.abs(m_elevator.getEncoder().getPosition())>Math.abs(position)){
-      
-    } else {
-      speed = -speed;
+    m_elevator.set(pid.calculate(m_elevator.getEncoder().getPosition(), position));
+    if(pid.atSetpoint()){
+      pid.reset();
     }
-    m_elevator.set(speed);
+    if(prevPos!= position){
+      pid.reset();
+    }
+    prevPos = position;
   }
   public void elevatorResetEncoders(){
     m_elevator.getEncoder().setPosition(0);
@@ -108,8 +115,67 @@ public class ElevatorSubsystem extends SubsystemBase {
       goToPosition(goalPos);
     }
   }
+  public void ElevatorFixModeEnable(){
+    SparkMaxConfig globalElevatorFixConfig =new SparkMaxConfig();
+    SparkMaxConfig leaderElevatorFixConfig = new SparkMaxConfig();
+    SparkMaxConfig followerElevatorFixConfig = new SparkMaxConfig();
+    SoftLimitConfig ElevatorFixLimitConfig = new SoftLimitConfig();
+
+    ElevatorFixLimitConfig
+      .forwardSoftLimit(0)//positive
+      .reverseSoftLimit(-ElevatorConstants.maxNeededElevatorHeight)//negative(direction we want to go)
+      .forwardSoftLimitEnabled(false)
+      .reverseSoftLimitEnabled(false);
+
+    globalElevatorFixConfig
+    .apply(ElevatorFixLimitConfig)
+      .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
+      .idleMode(ElevatorConstants.kElevatorIdleMode);
+    
+    leaderElevatorFixConfig
+      .apply(globalElevatorFixConfig)
+      .inverted(false);
+      
+    followerElevatorFixConfig
+      .apply(globalElevatorFixConfig)
+      .follow(m_elevator,true);
+    m_elevator.configure(leaderElevatorFixConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_elevator_follower.configure(followerElevatorFixConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  }
+  public void ElevatorFixModeDisable(){
+    SparkMaxConfig globalConfig = new SparkMaxConfig();
+    SparkMaxConfig leaderConfig = new SparkMaxConfig();
+    SparkMaxConfig followerConfig = new SparkMaxConfig();
+    SoftLimitConfig softLimitConfig = new SoftLimitConfig();
+    currentConfig = "default";
+
+
+    softLimitConfig
+      .forwardSoftLimit(0)//positive
+      .reverseSoftLimit(-ElevatorConstants.maxNeededElevatorHeight)//negative(direction we want to go)
+      .forwardSoftLimitEnabled(true)
+      .reverseSoftLimitEnabled(true);
+
+    globalConfig
+    .apply(softLimitConfig)
+      .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
+      .idleMode(ElevatorConstants.kElevatorIdleMode);
+      
+    leaderConfig
+      .apply(globalConfig)
+      .inverted(false);
+      
+    followerConfig
+      .apply(globalConfig)
+      .follow(m_elevator,true);
+      
+    m_elevator.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_elevator_follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+  }
   @Override
   public void periodic(){
+    SmartDashboard.putString("Current Config", currentConfig);
     SmartDashboard.putNumber("Elevator Speed", m_elevator.getEncoder().getVelocity());
     SmartDashboard.putNumber("Elevator pos", m_elevator.getEncoder().getPosition());
     SmartDashboard.putNumber("Elevator Goal Pos", goalPos);
