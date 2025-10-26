@@ -23,14 +23,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ReefSubsystem;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -49,7 +48,13 @@ public class RobotContainer {
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  CommandXboxController m_commanddriverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  XboxController m_elevatorController = new XboxController(OIConstants.kElevatorControllerPort);
+  //CommandXboxController m_commanddriverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  
+  
+
+
+  boolean fieldRelative = true;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -84,7 +89,7 @@ public class RobotContainer {
             -MathUtil.applyDeadband(m_driverController.getLeftY()*speedScale, OIConstants.kDriveDeadband),
             -MathUtil.applyDeadband(m_driverController.getLeftX()*speedScale, OIConstants.kDriveDeadband),
             -MathUtil.applyDeadband(m_driverController.getRightX()*speedScale, OIConstants.kDriveDeadband),
-            true),
+            fieldRelative),
         m_robotDrive));
 
     m_reef.setDefaultCommand(
@@ -117,7 +122,17 @@ public class RobotContainer {
   }
   
   public void periodic() {
-    System.out.println("test");
+    if(Math.abs(m_elevator.getElevatorPosition())>5){
+        speedScale = 0.1;
+    }
+    if(Math.abs(m_elevator.getElevatorPosition())>80&&
+    Math.abs(m_robotDrive.getSpeed())>0.2){
+      m_elevator.goToPosition(0);
+    }
+    if(Math.abs(m_robotDrive.getSpeed())>1){
+      m_elevator.goToPosition(0);
+    }
+    //System.out.println("test");
     var frontCamResult = frontCamera.getLatestResult();
     int frontTargetId = 0;
     if(frontCamResult.hasTargets()){
@@ -175,64 +190,66 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    new JoystickButton(m_driverController, Button.kStart.value)
+    new JoystickButton(m_elevatorController, Button.kStart.value)
     .onTrue(new RunCommand(
       () -> m_reef.moveCoral(0.165),
       m_elevator).withTimeout(1.0).andThen(new InstantCommand(
         () -> m_reef.moveCoral_stop(),
         m_elevator)));
 
-    new JoystickButton(m_driverController, Button.kX.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
-
-    new JoystickButton(m_driverController, Button.kY.value)
+    new JoystickButton(m_elevatorController, Button.kY.value)//change this to start or menu button
         .whileTrue(new RunCommand(
             () -> m_robotDrive.driveResetEncoders(),
             m_robotDrive)).whileTrue(new RunCommand(
                 () -> m_elevator.elevatorResetEncoders(),m_elevator));
-    //m_commanddriverController.rightTrigger().whileTrue
 
-    new JoystickButton(m_driverController, Button.kB.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.zeroHeading(),
-            m_robotDrive));         
-
-    new JoystickButton(m_driverController, Button.kLeftBumper.value)
+    new JoystickButton(m_elevatorController, Button.kLeftBumper.value)
         .whileTrue(new RunCommand(
             () -> m_reef.moveCoral(-0.165),m_reef))// amke sure left bumper pulls coral in, maybe have it slower
             .onFalse(new InstantCommand(
                 () -> m_reef.moveCoral_stop(),m_reef));
 
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
+    new JoystickButton(m_elevatorController, Button.kRightBumper.value)
         .whileTrue(new RunCommand(
             () -> m_reef.moveCoral(0.165),m_reef))
             .onFalse(new InstantCommand(
                 () -> m_reef.moveCoral_stop(),m_reef));
 
-    new JoystickButton(m_driverController, Button.kA.value)
+    new JoystickButton(m_elevatorController, Button.kA.value)
         .whileTrue(new RunCommand(
             () -> m_elevator.goToPosition(-35),//is inverted because upwards is negative
             m_elevator)).onFalse(new InstantCommand(
                 () -> m_elevator.lift_stop(),
                 m_elevator).andThen(new InstantCommand(()-> m_elevator.setGoalPosition(),m_elevator)));
 
-    new JoystickButton(m_driverController, Button.kLeftStick.value)
-        .onTrue(new InstantCommand(
-            () -> changeScale())); //may cause errors because non static
-
-    triggerButton(m_driverController,Axis.kLeftTrigger).whileTrue(new RunCommand(
+    triggerButton(m_elevatorController,Axis.kLeftTrigger).whileTrue(new RunCommand(
         () -> m_elevator.lift(m_driverController.getRawAxis(Axis.kLeftTrigger.value)),
         m_elevator)).onFalse(new InstantCommand(
             () -> m_elevator.lift_stop(),
             m_elevator).andThen(new InstantCommand(()-> m_elevator.setGoalPosition(),m_elevator)));
 
-    triggerButton(m_driverController,Axis.kRightTrigger).whileTrue(new RunCommand(
+    triggerButton(m_elevatorController,Axis.kRightTrigger).whileTrue(new RunCommand(
         () -> m_elevator.lift(-m_driverController.getRawAxis(Axis.kRightTrigger.value)),
         m_elevator)).onFalse(new InstantCommand(
             () -> m_elevator.lift_stop(),
             m_elevator).andThen(new InstantCommand(()-> m_elevator.setGoalPosition(),m_elevator)));
+    
+    new JoystickButton(m_driverController, Button.kX.value)
+        .whileTrue(new RunCommand(
+            () -> m_robotDrive.setX(),
+            m_robotDrive));
+
+    
+    new JoystickButton(m_driverController, Button.kB.value)
+        .whileTrue(new RunCommand(
+            () -> m_robotDrive.zeroHeading(),
+            m_robotDrive));         
+
+    
+    new JoystickButton(m_driverController, Button.kLeftStick.value)
+        .onTrue(new InstantCommand(
+            () -> changeScale())); //may cause errors because non static
+    
     
   }
 

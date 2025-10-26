@@ -46,7 +46,7 @@ public class ReefSubsystem extends SubsystemBase {
   }
 
   public void moveCoral_stop() {
-    m_coral.set(0.0);
+    m_coral.set(-0.01);// so that it prevents the thing from wiggling out, make sure it is negative
 
   }
   public void passivePower(){
