@@ -92,11 +92,13 @@ public class RobotContainer {
             () -> m_reef.autoLoadCoral(),
             m_reef)
     );
+    /*
     m_elevator.setDefaultCommand(
         new RunCommand(
             () -> m_elevator.stayAtPosition(),
             m_elevator)
     );
+    */
     NamedCommands.registerCommand("LiftElevatorCoral4", new RunCommand(
         () -> m_elevator.goToPosition(-35),//is inverted because upwards is negative
         m_elevator));

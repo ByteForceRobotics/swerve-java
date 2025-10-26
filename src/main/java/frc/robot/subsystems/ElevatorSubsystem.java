@@ -11,7 +11,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
@@ -59,15 +58,28 @@ public class ElevatorSubsystem extends SubsystemBase {
    *
    */
   public void lift(double xSpeed) {
-    m_elevator.set(xSpeed);
-    currentElevatorSpeed = xSpeed;
+    double truexSpeed = xSpeed;
+    
+    if(Math.abs(m_elevator.getEncoder().getPosition()+150)<15){
+      truexSpeed = xSpeed/4;
+    }
+    else if(Math.abs(m_elevator.getEncoder().getPosition())<15){
+      truexSpeed = xSpeed/4;
+    }
+    else if(Math.abs(m_elevator.getEncoder().getPosition()+80)<7){
+      truexSpeed = xSpeed/2;
+    }
+    else{
+      truexSpeed = xSpeed;
+    }
+    m_elevator.set(truexSpeed);
   }
   
   public void setGoalPosition(){
     goalPos = m_elevator.getEncoder().getPosition();
   }
   public void lift_stop() {
-    m_elevator.set(0.0);
+    m_elevator.set(-0.02);  //make sure its negative if using passive pwoer
     
   }
   private double calc_speed(double position){
