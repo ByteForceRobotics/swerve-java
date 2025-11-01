@@ -75,7 +75,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     if(Math.abs(m_elevator.getEncoder().getPosition()+150)<15){
       truexSpeed = xSpeed/4;
     }
-    else if(Math.abs(m_elevator.getEncoder().getPosition())<15){
+    else if(Math.abs(m_elevator.getEncoder().getPosition())<10){
       truexSpeed = xSpeed/4;
     }
     else if(Math.abs(m_elevator.getEncoder().getPosition()+75)<7){
