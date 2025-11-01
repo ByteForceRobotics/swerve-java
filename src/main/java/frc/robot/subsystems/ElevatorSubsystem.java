@@ -78,7 +78,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     else if(Math.abs(m_elevator.getEncoder().getPosition())<15){
       truexSpeed = xSpeed/4;
     }
-    else if(Math.abs(m_elevator.getEncoder().getPosition()+80)<7){
+    else if(Math.abs(m_elevator.getEncoder().getPosition()+75)<7){
       truexSpeed = xSpeed/2;
     }
     else{
@@ -93,10 +93,20 @@ public class ElevatorSubsystem extends SubsystemBase {
     goalPos = m_elevator.getEncoder().getPosition();
   }
   public void lift_stop() {
-    m_elevator.set(-0.02);  //make sure its negative if using passive pwoer
+    if(Math.abs(m_elevator.getEncoder().getPosition())<2){
+      m_elevator.set(0.0);
+    }
+    else if(Math.abs(m_elevator.getEncoder().getPosition())<73){
+      m_elevator.set(-0.01); 
+    }
+    else{
+      m_elevator.set(-0.02);
+    }
+     //make sure its negative if using passive pwoer
     
   }
-  public void goToPosition(double position){
+  @Deprecated // not working well
+  public void goToPIDPosition(double position){
     m_elevator.set(pid.calculate(m_elevator.getEncoder().getPosition(), position));
     if(pid.atSetpoint()){
       pid.reset();
@@ -105,6 +115,23 @@ public class ElevatorSubsystem extends SubsystemBase {
       pid.reset();
     }
     prevPos = position;
+  }
+  private double calc_speed(double position){
+    double distanceToPosition = position-m_elevator.getEncoder().getPosition();
+    double speed = Math.max(Math.min(0.3,distanceToPosition/10), 0.3);
+    if(Math.abs(distanceToPosition)<=0.5){
+      speed = 0;
+    }
+    return speed;
+  }
+  public void goToPosition(double position){
+    double speed = calc_speed(position);
+    if(Math.abs(m_elevator.getEncoder().getPosition())>Math.abs(position)){
+      
+    } else {
+      speed = -speed;
+    }
+    m_elevator.set(speed);
   }
   public void elevatorResetEncoders(){
     m_elevator.getEncoder().setPosition(0);
@@ -116,6 +143,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
   }
   public void ElevatorFixModeEnable(){
+    currentConfig = "fixmode";
     SparkMaxConfig globalElevatorFixConfig =new SparkMaxConfig();
     SparkMaxConfig leaderElevatorFixConfig = new SparkMaxConfig();
     SparkMaxConfig followerElevatorFixConfig = new SparkMaxConfig();
@@ -143,6 +171,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevator_follower.configure(followerElevatorFixConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
   public void ElevatorFixModeDisable(){
+
     SparkMaxConfig globalConfig = new SparkMaxConfig();
     SparkMaxConfig leaderConfig = new SparkMaxConfig();
     SparkMaxConfig followerConfig = new SparkMaxConfig();
@@ -172,6 +201,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevator.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_elevator_follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     
+  }
+  public void toggleElevatorFixMode(){
+    if(currentConfig.equals("default")){
+      ElevatorFixModeEnable();
+    }
+    else{
+      ElevatorFixModeDisable();
+    }
   }
   @Override
   public void periodic(){

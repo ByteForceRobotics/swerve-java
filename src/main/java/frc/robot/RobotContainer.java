@@ -4,11 +4,6 @@
 
 package frc.robot;
 
-import java.util.List;
-
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -25,11 +20,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ReefSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -44,6 +42,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ReefSubsystem m_reef = new ReefSubsystem();
+  private final VisionSubsystem m_vision = new VisionSubsystem();
   
 
   // The driver's controller
@@ -62,8 +61,7 @@ public class RobotContainer {
                                                                                                           
   //photon cam
   // java -jar "C:\FRC Code\PhotonVision\photonvision-v2025.3.1-winx64.jar"    
-  PhotonCamera frontCamera;
-  PhotonCamera rearCamera;
+  
   
   // differnet speed modes
   double speedScaleHigh = 1.0;
@@ -77,8 +75,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     //CameraServer.startAutomaticCapture();
-    frontCamera = new PhotonCamera("frontCam");
-    rearCamera = new PhotonCamera("rearCam");
+    
     // Configure default commands
     m_robotDrive.setDefaultCommand(
       // The left stick controls translation of the robot.
@@ -122,6 +119,10 @@ public class RobotContainer {
   }
   
   public void periodic() {
+    
+    SmartDashboard.putNumber("Not working",1);
+    SmartDashboard.putNumber("IAUSHDIUAHIWDHIAUHWDUH",m_robotDrive.getSpeed());
+
     if(Math.abs(m_elevator.getElevatorPosition())>5){
         speedScale = 0.1;
     }
@@ -132,26 +133,7 @@ public class RobotContainer {
     if(Math.abs(m_robotDrive.getSpeed())>1){
       m_elevator.goToPosition(0);
     }
-    //System.out.println("test");
-    var frontCamResult = frontCamera.getLatestResult();
-    int frontTargetId = 0;
-    if(frontCamResult.hasTargets()){
-      List<PhotonTrackedTarget> targets = frontCamResult.getTargets();
-      PhotonTrackedTarget frontTarget = frontCamResult.getBestTarget();
-      frontTargetId = frontTarget.getFiducialId();
-      System.out.println(frontTargetId);
-    }
-    SmartDashboard.putNumber("Front target id",frontTargetId);
-
-    var rearCamResult = rearCamera.getLatestResult();
-    int rearTargetId = 0;
-    if(rearCamResult.hasTargets()){
-      List<PhotonTrackedTarget> targets = rearCamResult.getTargets();
-      PhotonTrackedTarget rearTarget = rearCamResult.getBestTarget();
-      rearTargetId = rearTarget.getFiducialId();
-      System.out.println(rearTargetId);
-    }
-    SmartDashboard.putNumber("Rear target id",rearTargetId);
+    
     
     //boolean hasTargets = result.hasTargets();
     // java -jar "C:\FRC Code\PhotonVision\photonvision-v2025.3.1-winx64.jar"
@@ -189,51 +171,96 @@ public class RobotContainer {
    * and then calling passing it to a {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-
+    /* 
     new JoystickButton(m_elevatorController, Button.kStart.value)
     .onTrue(new RunCommand(
       () -> m_reef.moveCoral(0.165),
       m_elevator).withTimeout(1.0).andThen(new InstantCommand(
         () -> m_reef.moveCoral_stop(),
         m_elevator)));
-
-    new JoystickButton(m_elevatorController, Button.kY.value)//change this to start or menu button
+    */
+    
+    new JoystickButton(m_elevatorController, Button.kStart.value)//sets current elevator pos to min
         .whileTrue(new RunCommand(
-            () -> m_robotDrive.driveResetEncoders(),
-            m_robotDrive)).whileTrue(new RunCommand(
-                () -> m_elevator.elevatorResetEncoders(),m_elevator));
+            () -> m_elevator.elevatorResetEncoders(),m_elevator));
+
+    new JoystickButton(m_elevatorController, Button.kBack.value)//toggles limits on and off
+        .onTrue(new InstantCommand(
+            () -> m_elevator.toggleElevatorFixMode(),m_elevator));
+    
 
     new JoystickButton(m_elevatorController, Button.kLeftBumper.value)
         .whileTrue(new RunCommand(
-            () -> m_reef.moveCoral(-0.165),m_reef))// amke sure left bumper pulls coral in, maybe have it slower
+            () -> m_reef.moveCoral(-0.165),m_reef))//takes coral back in
             .onFalse(new InstantCommand(
                 () -> m_reef.moveCoral_stop(),m_reef));
 
     new JoystickButton(m_elevatorController, Button.kRightBumper.value)
         .whileTrue(new RunCommand(
-            () -> m_reef.moveCoral(0.165),m_reef))
+            () -> m_reef.moveCoral(0.165),m_reef))//dispenses coral
             .onFalse(new InstantCommand(
                 () -> m_reef.moveCoral_stop(),m_reef));
 
-    new JoystickButton(m_elevatorController, Button.kA.value)
+    
+    new JoystickButton(m_elevatorController, Button.kB.value)
         .whileTrue(new RunCommand(
-            () -> m_elevator.goToPosition(-35),//is inverted because upwards is negative
+            () -> m_elevator.goToPosition(-ElevatorConstants.kLevelTwoCoralHeight),//goes to level 2
             m_elevator)).onFalse(new InstantCommand(
                 () -> m_elevator.lift_stop(),
-                m_elevator).andThen(new InstantCommand(()-> m_elevator.setGoalPosition(),m_elevator)));
+                m_elevator));
 
+    new JoystickButton(m_elevatorController, Button.kX.value)
+        .whileTrue(new RunCommand(
+            () -> m_elevator.goToPosition(-ElevatorConstants.kLevelThreeCoralHeight),//goes to level 3
+            m_elevator)).onFalse(new InstantCommand(
+                () -> m_elevator.lift_stop(),
+                m_elevator));
+
+    new JoystickButton(m_elevatorController, Button.kY.value)
+        .whileTrue(new RunCommand(
+            () -> m_elevator.goToPosition(-ElevatorConstants.maxNeededElevatorHeight),//goes to level 4
+            m_elevator)).onFalse(new InstantCommand(
+                () -> m_elevator.lift_stop(),
+                m_elevator));
+
+    new JoystickButton(m_elevatorController, Button.kA.value)
+        .whileTrue(new RunCommand(
+            () -> m_elevator.goToPosition(0),//goes to zdero
+            m_elevator)).onFalse(new InstantCommand(
+                () -> m_elevator.lift_stop(),
+                m_elevator));
+    
     triggerButton(m_elevatorController,Axis.kLeftTrigger).whileTrue(new RunCommand(
-        () -> m_elevator.lift(m_driverController.getRawAxis(Axis.kLeftTrigger.value)),
+        () -> m_elevator.lift(m_elevatorController.getRawAxis(Axis.kLeftTrigger.value)),
         m_elevator)).onFalse(new InstantCommand(
             () -> m_elevator.lift_stop(),
-            m_elevator).andThen(new InstantCommand(()-> m_elevator.setGoalPosition(),m_elevator)));
+            m_elevator));
 
     triggerButton(m_elevatorController,Axis.kRightTrigger).whileTrue(new RunCommand(
-        () -> m_elevator.lift(-m_driverController.getRawAxis(Axis.kRightTrigger.value)),
+        () -> m_elevator.lift(-m_elevatorController.getRawAxis(Axis.kRightTrigger.value)),
         m_elevator)).onFalse(new InstantCommand(
             () -> m_elevator.lift_stop(),
-            m_elevator).andThen(new InstantCommand(()-> m_elevator.setGoalPosition(),m_elevator)));
-    
+            m_elevator));
+    new POVButton(m_elevatorController, 0)
+        .whileTrue(new RunCommand(
+            () -> m_reef.moveAlgae(-0.15),m_reef))//dispenses coral
+            .onFalse(new InstantCommand(
+                () -> m_reef.moveAlgae_stop(),m_reef));
+
+    new POVButton(m_elevatorController, 180)
+    .whileTrue(new RunCommand(
+      () -> m_reef.moveAlgae(0.15),m_reef))//dispenses coral
+      .onFalse(new InstantCommand(
+          () -> m_reef.moveAlgae_hold(),m_reef));
+
+
+
+
+
+
+
+
+
     new JoystickButton(m_driverController, Button.kX.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
@@ -244,13 +271,27 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));         
-
     
     new JoystickButton(m_driverController, Button.kLeftStick.value)
         .onTrue(new InstantCommand(
-            () -> changeScale())); //may cause errors because non static
-    
-    
+            () -> changeScale()));
+
+    new JoystickButton(m_driverController, Button.kY.value)
+        .whileTrue(new RunCommand(
+            () -> m_robotDrive.driveResetEncoders(),m_robotDrive));
+    //add POV buttons(d-pad) for strafing
+    new POVButton(m_driverController, 0)
+        .whileTrue(new RunCommand(
+            () -> m_robotDrive.bumper(0.5, 0),m_robotDrive));
+    new POVButton(m_driverController, 90)
+        .whileTrue(new RunCommand(
+            () -> m_robotDrive.bumper(0.5, 90),m_robotDrive));
+    new POVButton(m_driverController, 180)
+        .whileTrue(new RunCommand(
+            () -> m_robotDrive.bumper(0.5, 180),m_robotDrive));
+    new POVButton(m_driverController, 270)
+        .whileTrue(new RunCommand(
+            () -> m_robotDrive.bumper(0.5, 270),m_robotDrive));
   }
 
   public void changeScale(){

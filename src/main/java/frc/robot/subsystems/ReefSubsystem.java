@@ -6,10 +6,13 @@ package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SoftLimitConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ReefConstants;
 
 
@@ -30,12 +33,25 @@ public class ReefSubsystem extends SubsystemBase {
     m_coralBeamBreak = new DigitalInput(ReefConstants.kCoralBeamBreakDIO);
     funnelBeamBroken =  false;
     coralBeamBroken = false;
+
+
+
+    SparkMaxConfig algaeConfig =new SparkMaxConfig();
+
+    algaeConfig
+      .smartCurrentLimit(ReefConstants.AlgaeCurrentLimit);
   }
   public void moveAlgae(double speed) {
     m_algae.set(speed);
+    m_coral.set(speed);
+  }
+  public void moveAlgae_hold() {
+    m_algae.set(0.05);
+    m_coral.set(0.05);
   }
   public void moveAlgae_stop() {
-    m_algae.set(0.0);
+    m_algae.set(0.00);
+    m_coral.set(0.00);
   }
   /**
    * Method to lift the elevator using joystick info.
@@ -54,7 +70,7 @@ public class ReefSubsystem extends SubsystemBase {
     m_algae.set(0);
   }
   public void autoLoadCoral(){
-    if(funnelBeamBroken){
+    if(funnelBeamBroken&&!coralBeamBroken){
       moveCoral(ReefConstants.kCoralAutoLoadSpeed);
       //moveAlgae(ReefConstants.kAlgaeAutoLoadSpeed);
     }
