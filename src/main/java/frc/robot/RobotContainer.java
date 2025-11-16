@@ -119,7 +119,7 @@ public class RobotContainer {
   }
   
   public void periodic() {
-    
+    /* 
     SmartDashboard.putNumber("Not working",1);
     SmartDashboard.putNumber("IAUSHDIUAHIWDHIAUHWDUH",m_robotDrive.getSpeed());
 
@@ -133,7 +133,7 @@ public class RobotContainer {
     if(Math.abs(m_robotDrive.getSpeed())>1){
       m_elevator.goToPosition(0);
     }
-    
+    */
     
     //boolean hasTargets = result.hasTargets();
     // java -jar "C:\FRC Code\PhotonVision\photonvision-v2025.3.1-winx64.jar"
@@ -183,11 +183,12 @@ public class RobotContainer {
     new JoystickButton(m_elevatorController, Button.kStart.value)//sets current elevator pos to min
         .whileTrue(new RunCommand(
             () -> m_elevator.elevatorResetEncoders(),m_elevator));
-
+    
+    /*
     new JoystickButton(m_elevatorController, Button.kBack.value)//toggles limits on and off
         .onTrue(new InstantCommand(
             () -> m_elevator.toggleElevatorFixMode(),m_elevator));
-    
+    */
 
     new JoystickButton(m_elevatorController, Button.kLeftBumper.value)
         .whileTrue(new RunCommand(
@@ -241,18 +242,19 @@ public class RobotContainer {
         m_elevator)).onFalse(new InstantCommand(
             () -> m_elevator.lift_stop(),
             m_elevator));
+    /*
     new POVButton(m_elevatorController, 0)
         .whileTrue(new RunCommand(
-            () -> m_reef.moveAlgae(-0.15),m_reef))//dispenses coral
+            () -> m_reef.moveAlgae(-0.15),m_reef))//dispenses  algae
             .onFalse(new InstantCommand(
                 () -> m_reef.moveAlgae_stop(),m_reef));
 
     new POVButton(m_elevatorController, 180)
     .whileTrue(new RunCommand(
-      () -> m_reef.moveAlgae(0.15),m_reef))//dispenses coral
+      () -> m_reef.moveAlgae(0.15),m_reef))//intakes algae
       .onFalse(new InstantCommand(
           () -> m_reef.moveAlgae_hold(),m_reef));
-
+    */
 
 
 

@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Test Path"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LiftElevatorCoral4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DeployCoral"
+            "pathName": "New Path"
           }
         }
       ]

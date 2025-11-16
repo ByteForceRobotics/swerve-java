@@ -75,10 +75,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     if(Math.abs(m_elevator.getEncoder().getPosition()+150)<15){
       truexSpeed = xSpeed/4;
     }
-    else if(Math.abs(m_elevator.getEncoder().getPosition())<10){
+    else if(Math.abs(m_elevator.getEncoder().getPosition())<15){
       truexSpeed = xSpeed/4;
     }
-    else if(Math.abs(m_elevator.getEncoder().getPosition()+75)<7){
+    else if(Math.abs(m_elevator.getEncoder().getPosition()+75)<15){
       truexSpeed = xSpeed/2;
     }
     else{
@@ -118,7 +118,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
   private double calc_speed(double position){
     double distanceToPosition = position-m_elevator.getEncoder().getPosition();
-    double speed = Math.max(Math.min(0.3,distanceToPosition/10), 0.3);
+    double speed = Math.max(Math.min(0.5,distanceToPosition/10), 0.3);
     if(Math.abs(distanceToPosition)<=0.5){
       speed = 0;
     }

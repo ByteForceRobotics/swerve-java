@@ -37,13 +37,13 @@ public class VisionSubsystem extends SubsystemBase {
         //List<PhotonTrackedTarget> targets = frontCamResult.getTargets();
         PhotonTrackedTarget frontTarget = frontCamResult.getBestTarget();
         frontTargetId = frontTarget.getFiducialId();
-        System.out.println(frontTargetId);
+        //System.out.println(frontTargetId);
       }
     }
     SmartDashboard.putNumber("Front target id",frontTargetId);
     
     var rearCamResults = rearCamera.getAllUnreadResults();
-    int rearTargetId = 0;
+    rearTargetId = 0;
     if(!rearCamResults.isEmpty()){
       PhotonPipelineResult rearCamResult = rearCamResults.get(0);
       if(rearCamResult.hasTargets()){
@@ -53,7 +53,7 @@ public class VisionSubsystem extends SubsystemBase {
         System.out.println(rearTargetId);
       }
     }
-    SmartDashboard.putNumber("Rear target id",rearTargetId);
+    //SmartDashboard.putNumber("Rear target id",rearTargetId);
 
   }
 }
