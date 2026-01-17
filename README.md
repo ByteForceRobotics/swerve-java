@@ -43,3 +43,10 @@ TODO:
 * set up simulator
   *
 
+
+
+ADd exponential drive
+
+
+and also implemnt trigger for driving slowdown
+

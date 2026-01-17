@@ -50,10 +50,10 @@ public class VisionSubsystem extends SubsystemBase {
         //List<PhotonTrackedTarget> targets = rearCamResult.getTargets();
         PhotonTrackedTarget rearTarget = rearCamResult.getBestTarget();
         rearTargetId = rearTarget.getFiducialId();
-        System.out.println(rearTargetId);
+        System.out.println("rearTargetId: " + rearTargetId);
       }
     }
-    //SmartDashboard.putNumber("Rear target id",rearTargetId);
+    SmartDashboard.putNumber("Rear target id",rearTargetId);
 
   }
 }

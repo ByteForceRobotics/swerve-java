@@ -11,58 +11,6 @@
         "vgap": 16.0,
         "titleType": 0,
         "tiles": {
-          "6,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/getPos",
-              "_title": "getPos",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "5,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/getVelo",
-              "_title": "getVelo",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "7,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/getPosFL",
-              "_title": "getPosFL",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "8,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/getPosFR",
-              "_title": "getPosFR",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "9,0": {
             "size": [
               1,
@@ -202,19 +150,6 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Elevator pos",
               "_title": "Elevator pos",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "9,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/x_key",
-              "_title": "x_key",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -368,6 +303,32 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "7,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Front target id",
+              "_title": "Front target id",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Rear target id",
+              "_title": "Rear target id",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -385,13 +346,13 @@
         "tiles": {
           "0,0": {
             "size": [
-              3,
+              4,
               3
             ],
             "content": {
               "_type": "Camera Stream",
-              "_source0": "camera_server://HD_Pro_Webcam_C920",
-              "_title": "HD_Pro_Webcam_C920",
+              "_source0": "camera_server://photonvision_Port_1184_Output_MJPEG_Server",
+              "_title": "photonvision_Port_1184_Output_MJPEG_Server",
               "_glyph": 148,
               "_showGlyph": false,
               "Crosshair/Show crosshair": true,
@@ -404,15 +365,15 @@
               "imageHeight": 0
             }
           },
-          "3,0": {
+          "4,0": {
             "size": [
-              3,
+              4,
               3
             ],
             "content": {
               "_type": "Camera Stream",
-              "_source0": "camera_server://FrontCam",
-              "_title": "FrontCam",
+              "_source0": "camera_server://photonvision_Port_1182_Output_MJPEG_Server",
+              "_title": "photonvision_Port_1182_Output_MJPEG_Server",
               "_glyph": 148,
               "_showGlyph": false,
               "Crosshair/Show crosshair": true,
