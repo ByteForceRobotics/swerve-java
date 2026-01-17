@@ -67,6 +67,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       });
+  double speed  = 0;
 
   /** Creates a new DriveSubsystem. */
 
@@ -184,7 +185,7 @@ public class DriveSubsystem extends SubsystemBase {
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
-    double speed = xSpeed+ySpeed+rot;
+    this.speed = Math.sqrt(Math.pow(xSpeedDelivered,2)+Math.pow(ySpeedDelivered,2));
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
